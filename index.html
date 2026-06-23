@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人股票交易紀錄表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 隱藏數字輸入框的上下箭頭 */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6 min-h-screen">
+
+    <div class="max-w-5xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">📈 股票進出紀錄表</h1>
+                <p class="text-sm text-gray-500 mt-1">資料皆安全保存在您的瀏覽器中 (LocalStorage)</p>
+            </div>
+            <div class="text-right">
+                <div class="text-sm text-gray-500">初始本金</div>
+                <div class="text-lg font-semibold text-gray-700">NT$ 300,000</div>
+                <div class="text-sm text-gray-500 mt-2">目前餘額</div>
+                <div id="current-balance" class="text-2xl font-bold text-blue-600">NT$ 300,000</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4" id="form-title">新增交易紀錄</h2>
+            <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <input type="hidden" id="tx-id">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">日期 *</label>
+                    <input type="date" id="tx-date" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">股票名稱 *</label>
+                    <input type="text" id="tx-name" placeholder="例: 台積電" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">買進金額 *</label>
+                    <input type="number" id="tx-buy" placeholder="輸入總成本" required min="0" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">賣出金額 (選填)</label>
+                    <input type="number" id="tx-sell" placeholder="尚未賣出留空" min="0" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                </div>
+                
+                <div class="flex gap-2">
+                    <button type="submit" id="submit-btn" class="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition">新增紀錄</button>
+                    <button type="button" id="cancel-btn" class="hidden w-1/2 bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md hover:bg-gray-400 transition" onclick="resetForm()">取消</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">股票名稱</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">買進金額</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">賣出金額</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">價差 (損益)</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">餘額</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                </table>
+            </div>
+            
+            <div id="empty-state" class="hidden text-center py-10 text-gray-500 border-b border-gray-200">
+                目前還沒有任何交易紀錄，請從上方表單新增。
+            </div>
+
+            <div id="pagination-controls" class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200 hidden">
+                <div class="text-sm text-gray-500" id="page-info">
+                    顯示第 1 頁，共 1 頁
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="changePage(-1)" id="btn-prev" class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">上一頁</button>
+                    <button onclick="changePage(1)" id="btn-next" class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">下一頁</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始設定
+        const INITIAL_CAPITAL = 300000;
+        const STORAGE_KEY = 'stock_transactions_data';
+        let transactions = [];
+        
+        // 翻頁設定
+        let currentPage = 1;
+        const itemsPerPage = 10; // 每頁顯示 10 筆
+
+        // DOM 元素
+        const form = document.getElementById('transaction-form');
+        const tbody = document.getElementById('table-body');
+        const emptyState = document.getElementById('empty-state');
+        const paginationControls = document.getElementById('pagination-controls');
+        const pageInfo = document.getElementById('page-info');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const currentBalanceEl = document.getElementById('current-balance');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const formTitle = document.getElementById('form-title');
+
+        // 初始化載入資料
+        function init() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                transactions = JSON.parse(savedData);
+            }
+            document.getElementById('tx-date').valueAsDate = new Date();
+            renderTable();
+        }
+
+        // 格式化金錢顯示
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(amount);
+        }
+
+        // 渲染表格與計算餘額
+        function renderTable() {
+            tbody.innerHTML = '';
+            let runningBalance = INITIAL_CAPITAL;
+
+            // 1. 依照日期排序 (舊到新)，確保餘額計算正確
+            transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // 2. 預先計算每一筆的當下餘額與價差
+            const processedTxs = transactions.map((tx) => {
+                const buyAmt = Number(tx.buy);
+                const isSold = tx.sell !== "" && tx.sell !== null;
+                const sellAmt = isSold ? Number(tx.sell) : 0;
+                
+                // 計算邏輯：餘額 = 先前餘額 - 買進成本 + 賣出收入
+                runningBalance = runningBalance - buyAmt + sellAmt;
+
+                let profitDisplay = '<span class="text-gray-400">-</span>';
+                if (isSold) {
+                    const profit = sellAmt - buyAmt;
+                    if (profit > 0) {
+                        profitDisplay = `<span class="text-red-500 font-bold">+${formatMoney(profit)}</span>`;
+                    } else if (profit < 0) {
+                        profitDisplay = `<span class="text-green-500 font-bold">${formatMoney(profit)}</span>`;
+                    } else {
+                        profitDisplay = `<span class="text-gray-700 font-bold">${formatMoney(0)}</span>`;
+                    }
+                }
+
+                return {
+                    ...tx,
+                    buyAmt,
+                    isSold,
+                    sellAmt,
+                    profitDisplay,
+                    balanceAtTime: runningBalance
+                };
+            });
+
+            // 更新畫面上方的總餘額顯示
+            currentBalanceEl.innerText = formatMoney(runningBalance);
+            if(runningBalance < 0) {
+                currentBalanceEl.classList.replace('text-blue-600', 'text-red-600');
+            } else {
+                currentBalanceEl.classList.replace('text-red-600', 'text-blue-600');
+            }
+
+            // 判斷是否顯示空狀態或翻頁控制
+            if (processedTxs.length === 0) {
+                emptyState.classList.remove('hidden');
+                paginationControls.classList.add('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+                paginationControls.classList.remove('hidden');
+            }
+
+            // 3. 處理翻頁：將陣列反轉 (讓最新的日期排最上面)，然後切出當前頁面的資料
+            const reversedTxs = [...processedTxs].reverse();
+            const totalPages = Math.ceil(reversedTxs.length / itemsPerPage);
+            
+            // 防呆：確保當前頁碼沒有超出範圍
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const paginatedTxs = reversedTxs.slice(startIndex, startIndex + itemsPerPage);
+
+            // 4. 渲染當前頁面的資料
+            paginatedTxs.forEach((tx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${tx.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${tx.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">${formatMoney(tx.buyAmt)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">${tx.isSold ? formatMoney(tx.sellAmt) : '<span class="text-gray-400 text-xs">持有中</span>'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right">${tx.profitDisplay}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold ${tx.balanceAtTime < 0 ? 'text-red-600' : 'text-blue-600'}">${formatMoney(tx.balanceAtTime)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                        <button onclick="editTx('${tx.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">編輯</button>
+                        <button onclick="deleteTx('${tx.id}')" class="text-red-600 hover:text-red-900">刪除</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 5. 更新翻頁按鈕與文字狀態
+            pageInfo.innerText = `顯示第 ${currentPage} 頁，共 ${totalPages} 頁 (總計 ${transactions.length} 筆)`;
+            btnPrev.disabled = currentPage === 1;
+            btnNext.disabled = currentPage === totalPages;
+        }
+
+        // 翻頁動作
+        window.changePage = function(offset) {
+            currentPage += offset;
+            renderTable();
+        }
+
+        // 儲存資料到 LocalStorage
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+            renderTable();
+        }
+
+        // 處理表單提交 (新增/修改)
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('tx-id').value;
+            const date = document.getElementById('tx-date').value;
+            const name = document.getElementById('tx-name').value;
+            const buy = document.getElementById('tx-buy').value;
+            const sell = document.getElementById('tx-sell').value;
+
+            if (id) {
+                // 更新現有紀錄
+                const index = transactions.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    transactions[index] = { id, date, name, buy, sell };
+                }
+            } else {
+                // 新增紀錄
+                const newTx = {
+                    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(), // 產生唯一ID
+                    date,
+                    name,
+                    buy,
+                    sell
+                };
+                transactions.push(newTx);
+            }
+
+            // 新增資料後，把頁碼切回第一頁看最新結果
+            currentPage = 1;
+            saveData();
+            resetForm();
+        });
+
+        // 刪除紀錄
+        window.deleteTx = function(id) {
+            if (confirm('確定要刪除這筆交易紀錄嗎？這將會重新計算餘額。')) {
+                transactions = transactions.filter(t => t.id !== id);
+                saveData();
+            }
+        }
+
+        // 編輯紀錄 (載入資料至表單)
+        window.editTx = function(id) {
+            const tx = transactions.find(t => t.id === id);
+            if (!tx) return;
+
+            document.getElementById('tx-id').value = tx.id;
+            document.getElementById('tx-date').value = tx.date;
+            document.getElementById('tx-name').value = tx.name;
+            document.getElementById('tx-buy').value = tx.buy;
+            document.getElementById('tx-sell').value = tx.sell;
+
+            formTitle.innerText = "編輯交易紀錄";
+            submitBtn.innerText = "儲存修改";
+            submitBtn.classList.replace('bg-blue-600', 'bg-green-600');
+            submitBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            cancelBtn.classList.remove('hidden');
+            cancelBtn.classList.add('block');
+            
+            // 滾動到表單位置
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 重置表單狀態
+        window.resetForm = function() {
+            form.reset();
+            document.getElementById('tx-id').value = "";
+            document.getElementById('tx-date').valueAsDate = new Date();
+            
+            formTitle.innerText = "新增交易紀錄";
+            submitBtn.innerText = "新增紀錄";
+            submitBtn.classList.replace('bg-green-600', 'bg-blue-600');
+            submitBtn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+            cancelBtn.classList.add('hidden');
+            cancelBtn.classList.remove('block');
+        }
+
+        // 執行初始化
+        init();
+    </script>
+</body>
+</html>
