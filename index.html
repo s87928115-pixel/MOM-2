@@ -23,10 +23,13 @@
                 <p class="text-sm text-gray-500 mt-1">資料皆安全保存在您的瀏覽器中 (LocalStorage)</p>
             </div>
             <div class="text-right">
-                <div class="text-sm text-gray-500">初始本金</div>
-                <div class="text-lg font-semibold text-gray-700">NT$ 300,000</div>
+                <div class="text-sm text-gray-500 flex justify-end items-center gap-2">
+                    初始本金
+                    <button onclick="editCapital()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded transition cursor-pointer">修改</button>
+                </div>
+                <div id="display-capital" class="text-lg font-semibold text-gray-700">NT$ 300,000</div>
                 <div class="text-sm text-gray-500 mt-2">目前餘額</div>
-                <div id="current-balance" class="text-2xl font-bold text-blue-600">NT$ 62,418</div>
+                <div id="current-balance" class="text-2xl font-bold text-blue-600">NT$ 300,000</div>
             </div>
         </div>
 
@@ -98,10 +101,13 @@
     </div>
 
     <script>
-        // 初始設定
-        const INITIAL_CAPITAL = 300000;
+        // 設定與儲存金鑰
         const STORAGE_KEY = 'stock_transactions_data';
+        const CAPITAL_KEY = 'stock_initial_capital';
+        
+        // 變數初始化
         let transactions = [];
+        let initialCapital = 300000; // 預設初始本金
         
         // 翻頁設定
         let currentPage = 1;
@@ -116,16 +122,25 @@
         const btnPrev = document.getElementById('btn-prev');
         const btnNext = document.getElementById('btn-next');
         const currentBalanceEl = document.getElementById('current-balance');
+        const displayCapitalEl = document.getElementById('display-capital');
         const submitBtn = document.getElementById('submit-btn');
         const cancelBtn = document.getElementById('cancel-btn');
         const formTitle = document.getElementById('form-title');
 
         // 初始化載入資料
         function init() {
+            // 讀取交易紀錄
             const savedData = localStorage.getItem(STORAGE_KEY);
             if (savedData) {
                 transactions = JSON.parse(savedData);
             }
+            
+            // 讀取自訂本金
+            const savedCapital = localStorage.getItem(CAPITAL_KEY);
+            if (savedCapital !== null) {
+                initialCapital = Number(savedCapital);
+            }
+
             document.getElementById('tx-date').valueAsDate = new Date();
             renderTable();
         }
@@ -135,10 +150,36 @@
             return new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(amount);
         }
 
+        // 修改初始本金
+        window.editCapital = function() {
+            const input = prompt("請輸入您的初始本金：", initialCapital);
+            
+            // 如果使用者按取消或沒有輸入，直接離開
+            if (input === null || input.trim() === "") return; 
+            
+            // 移除可能輸入的逗號並轉成數字
+            const newCapital = Number(input.replace(/,/g, '').trim());
+            
+            if (isNaN(newCapital) || newCapital < 0) {
+                alert("請輸入有效的金額！");
+                return;
+            }
+            
+            initialCapital = newCapital;
+            localStorage.setItem(CAPITAL_KEY, initialCapital);
+            
+            // 重新渲染表格與餘額
+            renderTable();
+        }
+
         // 渲染表格與計算餘額
         function renderTable() {
             tbody.innerHTML = '';
-            let runningBalance = INITIAL_CAPITAL;
+            
+            // 更新上方初始本金顯示
+            displayCapitalEl.innerText = formatMoney(initialCapital);
+            
+            let runningBalance = initialCapital;
 
             // 1. 依照日期排序 (舊到新)，確保餘額計算正確
             transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
