@@ -1,366 +1,314 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人股票交易紀錄表</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* 隱藏數字輸入框的上下箭頭 */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cherry 英文作業學習｜專案固定指令規格書</title>
+  <style>
+    :root {
+      --bg-cream: #FAF7F2;
+      --card-bg: #FFFFFF;
+      --border-warm: #EADBC8;
+      --accent-warm: #D4A373;
+      --accent-deep: #A9714B;
+      --text-main: #333333;
+      --text-muted: #666666;
+      --tag-bg: #F4EAE0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.6;
+      padding: 30px 16px;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border-warm);
+      border-radius: 14px;
+      padding: 36px 40px;
+      box-shadow: 0 4px 16px rgba(169, 113, 75, 0.06);
+    }
+
+    header {
+      border-bottom: 2px dashed var(--border-warm);
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    h1 {
+      font-size: 1.65rem;
+      color: var(--accent-deep);
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .print-btn {
+      background-color: var(--accent-warm);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .print-btn:hover {
+      background-color: var(--accent-deep);
+    }
+
+    section {
+      margin-bottom: 26px;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      color: var(--accent-deep);
+      border-left: 4px solid var(--accent-warm);
+      padding-left: 10px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    p, li {
+      font-size: 0.98rem;
+      color: var(--text-main);
+    }
+
+    ul, ol {
+      padding-left: 22px;
+      margin-bottom: 10px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .notice-box {
+      background-color: var(--tag-bg);
+      border-left: 4px solid var(--accent-deep);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    /* 單字卡範例卡片 */
+    .card-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .flashcard {
+      background: var(--bg-cream);
+      border: 1.5px solid var(--border-warm);
+      border-radius: 12px;
+      padding: 16px 20px;
+      position: relative;
+    }
+
+    .flashcard .word-title {
+      font-size: 1.7rem;
+      font-weight: bold;
+      color: #222;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .flashcard .ipa {
+      font-size: 1.05rem;
+      color: var(--accent-deep);
+      font-family: "Lucida Sans Unicode", "DejaVu Sans", sans-serif;
+    }
+
+    ruby {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #2b2b2b;
+    }
+
+    rt {
+      font-size: 0.55rem;
+      color: #666;
+      font-weight: normal;
+    }
+
+    .card-meta {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border-warm);
+      padding-top: 8px;
+    }
+
+    .card-meta div {
+      margin-bottom: 4px;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: bold;
+      background: var(--accent-warm);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+      .container {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .print-btn {
+        display: none;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans p-6 min-h-screen">
+<body>
 
-    <div class="max-w-5xl mx-auto">
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">📈 股票進出紀錄表</h1>
-                <p class="text-sm text-gray-500 mt-1">資料皆安全保存在您的瀏覽器中 (LocalStorage)</p>
-            </div>
-            <div class="text-right">
-                <div class="text-sm text-gray-500 flex justify-end items-center gap-2">
-                    初始本金
-                    <button onclick="editCapital()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded transition cursor-pointer">修改</button>
-                </div>
-                <div id="display-capital" class="text-lg font-semibold text-gray-700">NT$ 300,000</div>
-                <div class="text-sm text-gray-500 mt-2">目前餘額</div>
-                <div id="current-balance" class="text-2xl font-bold text-blue-600">NT$ 300,000</div>
-            </div>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Cherry 英文作業學習｜專案固定指令</h1>
+        <div class="subtitle">幼兒園大班（5–6 歲）雙語識字與自然發音長期專案</div>
+      </div>
+      <button class="print-btn" onclick="window.print()">列印 / 另存 PDF</button>
+    </header>
+
+    <!-- 一、學習目標 -->
+    <section>
+      <h2>一、學習目標</h2>
+      <p>協助 Cherry（幼兒園大班）學習英文單字，同時練習繁體中文字形與國語注音。</p>
+      <p>採用適合 5–6 歲幼兒的教學方式：以<strong>真實圖片聯想、自然發音 (Phonics)、中文識字及理解</strong>為主，不強迫死記死背。</p>
+    </section>
+
+    <!-- 二、固定單字卡格式 -->
+    <section>
+      <h2>二、固定單字卡規格（七項必備）</h2>
+      <ol>
+        <li><strong>寫實圖片</strong>：真實攝影風格，意象具體清晰，不用卡通簡筆畫。</li>
+        <li><strong>英文單字</strong>：字體清晰俐落，利於幼兒辨認。</li>
+        <li><strong>英文 IPA 音標</strong>：標準美式英語發音。</li>
+        <li><strong>繁體中文意思</strong>：台灣常見、適合兒童理解的詞彙。</li>
+        <li><strong>中文國語注音</strong>：對應中文詞義，標記教育部標準注音與完整聲調。</li>
+        <li><strong>英翻英解釋</strong>：幼兒可理解的淺白英文句子。</li>
+        <li><strong>學習注意事項</strong>：特別提示 Phonics 發音規則、長短母音或識字重點。</li>
+      </ol>
+    </section>
+
+    <!-- 三、發音與標注規範 -->
+    <section>
+      <h2>三、重要發音與語文規範</h2>
+      <ul>
+        <li><strong>英文發音</strong>：採用標準 IPA 音標，嚴格<strong>禁止</strong>使用中文字或注音模擬英文讀音。</li>
+        <li><strong>中文注音</strong>：注音專屬繁體中文詞義，依台灣教育部審定標準（標示一、二、三、四聲與輕聲）。</li>
+        <li><strong>美式音標為準</strong>：標示常見的短母音、長母音及自然拼讀拼寫組合。</li>
+      </ul>
+    </section>
+
+    <!-- 四、固定呈現範例 -->
+    <section>
+      <h2>四、單字卡呈現範例</h2>
+      <div class="card-preview-grid">
+        <!-- Card 1: pan -->
+        <div class="flashcard">
+          <div>
+            <span class="word-title">pan</span>
+            <span class="ipa">/pæn/</span>
+          </div>
+          <div style="margin-top: 6px;">
+            <ruby>平<rt>ㄆㄧㄥˊ</rt></ruby>
+            <ruby>底<rt>ㄉㄧˇ</rt></ruby>
+            <ruby>鍋<rt>ㄍㄨㄛ</rt></ruby>
+          </div>
+          <div class="card-meta">
+            <div><span class="tag">定義</span> a shallow pan used for cooking</div>
+            <div><span class="tag">提示</span> 字母 <strong>a</strong> 發短母音 <strong>/æ/</strong>，下巴微開、嘴角張開。</div>
+          </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 class="text-lg font-semibold mb-4" id="form-title">新增交易紀錄</h2>
-            <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                <input type="hidden" id="tx-id">
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">日期 *</label>
-                    <input type="date" id="tx-date" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">股票名稱 *</label>
-                    <input type="text" id="tx-name" placeholder="例: 台積電" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">買進金額 *</label>
-                    <input type="number" id="tx-buy" placeholder="輸入總成本" required min="0" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">賣出金額 (選填)</label>
-                    <input type="number" id="tx-sell" placeholder="尚未賣出留空" min="0" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                </div>
-                
-                <div class="flex gap-2">
-                    <button type="submit" id="submit-btn" class="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition">新增紀錄</button>
-                    <button type="button" id="cancel-btn" class="hidden w-1/2 bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md hover:bg-gray-400 transition" onclick="resetForm()">取消</button>
-                </div>
-            </form>
+        <!-- Card 2: cat -->
+        <div class="flashcard">
+          <div>
+            <span class="word-title">cat</span>
+            <span class="ipa">/kæt/</span>
+          </div>
+          <div style="margin-top: 6px;">
+            <ruby>貓<rt>ㄇㄠ</rt></ruby>
+          </div>
+          <div class="card-meta">
+            <div><span class="tag">定義</span> a small animal often kept as a pet</div>
+            <div><span class="tag">提示</span> <strong>cat</strong> 和 <strong>pan</strong> 的 <strong>a</strong> 同樣發 <strong>/æ/</strong>。</div>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">股票名稱</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">買進金額</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">賣出金額</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">價差 (損益)</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">餘額</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body" class="bg-white divide-y divide-gray-200">
-                        </tbody>
-                </table>
-            </div>
-            
-            <div id="empty-state" class="hidden text-center py-10 text-gray-500 border-b border-gray-200">
-                目前還沒有任何交易紀錄，請從上方表單新增。
-            </div>
+    <!-- 五、PDF 製作與排版標準 -->
+    <section>
+      <h2>五、PDF 製作與排版標準</h2>
+      <ul>
+        <li><strong>紙張規格</strong>：A4 直式，適於居家高畫質列印。</li>
+        <li><strong>配色風格</strong>：米白、暖奶油色調底色，視覺柔和護眼。</li>
+        <li><strong>視覺比例</strong>：英文單字最大、繁體中文次之，中文注音緊貼漢字旁。</li>
+        <li><strong>分組邏輯</strong>：單字依 Phonics 發音特徵分組，並保留充裕留白。</li>
+      </ul>
+    </section>
 
-            <div id="pagination-controls" class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200 hidden">
-                <div class="text-sm text-gray-500" id="page-info">
-                    顯示第 1 頁，共 1 頁
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="changePage(-1)" id="btn-prev" class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">上一頁</button>
-                    <button onclick="changePage(1)" id="btn-next" class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">下一頁</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- 六、作業自動化處理流程 -->
+    <section>
+      <h2>六、每次作業處理流程</h2>
+      <ol>
+        <li>讀取家長上傳的英文作業照片。</li>
+        <li>辨識並完整列出所有英文生字清單。</li>
+        <li>核對英文拼字、IPA 音標、台灣繁體中文詞義及國語注音。</li>
+        <li>產製單字之寫實影像畫面。</li>
+        <li>補充淺白英解與拼讀注意事項。</li>
+        <li>提供線上文字排版預覽。</li>
+        <li>生成符合規範的 A4 直式 PDF 文件供下載。</li>
+      </ol>
+    </section>
 
-    <script>
-        // 設定與儲存金鑰
-        const STORAGE_KEY = 'stock_transactions_data';
-        const CAPITAL_KEY = 'stock_initial_capital';
-        
-        // 變數初始化
-        let transactions = [];
-        let initialCapital = 300000; // 預設初始本金
-        
-        // 翻頁設定
-        let currentPage = 1;
-        const itemsPerPage = 10; // 每頁顯示 10 筆
+    <!-- 七、教學與互動建議 -->
+    <section>
+      <h2>七、教學實施原則</h2>
+      <p>建議每日固定 10–15 分鐘輕鬆學習，依序引導：</p>
+      <div class="notice-box">
+        <strong>看圖片 → 說英文 → 聽正確發音 → 理解英文意思 → 認識繁體中文 → 練習國語注音 → 簡單複習問答。</strong>
+      </div>
+    </section>
+  </div>
 
-        // DOM 元素
-        const form = document.getElementById('transaction-form');
-        const tbody = document.getElementById('table-body');
-        const emptyState = document.getElementById('empty-state');
-        const paginationControls = document.getElementById('pagination-controls');
-        const pageInfo = document.getElementById('page-info');
-        const btnPrev = document.getElementById('btn-prev');
-        const btnNext = document.getElementById('btn-next');
-        const currentBalanceEl = document.getElementById('current-balance');
-        const displayCapitalEl = document.getElementById('display-capital');
-        const submitBtn = document.getElementById('submit-btn');
-        const cancelBtn = document.getElementById('cancel-btn');
-        const formTitle = document.getElementById('form-title');
-
-        // 初始化載入資料
-        function init() {
-            // 讀取交易紀錄
-            const savedData = localStorage.getItem(STORAGE_KEY);
-            if (savedData) {
-                transactions = JSON.parse(savedData);
-            }
-            
-            // 讀取自訂本金
-            const savedCapital = localStorage.getItem(CAPITAL_KEY);
-            if (savedCapital !== null) {
-                initialCapital = Number(savedCapital);
-            }
-
-            document.getElementById('tx-date').valueAsDate = new Date();
-            renderTable();
-        }
-
-        // 格式化金錢顯示
-        function formatMoney(amount) {
-            return new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(amount);
-        }
-
-        // 修改初始本金
-        window.editCapital = function() {
-            const input = prompt("請輸入您的初始本金：", initialCapital);
-            
-            // 如果使用者按取消或沒有輸入，直接離開
-            if (input === null || input.trim() === "") return; 
-            
-            // 移除可能輸入的逗號並轉成數字
-            const newCapital = Number(input.replace(/,/g, '').trim());
-            
-            if (isNaN(newCapital) || newCapital < 0) {
-                alert("請輸入有效的金額！");
-                return;
-            }
-            
-            initialCapital = newCapital;
-            localStorage.setItem(CAPITAL_KEY, initialCapital);
-            
-            // 重新渲染表格與餘額
-            renderTable();
-        }
-
-        // 渲染表格與計算餘額
-        function renderTable() {
-            tbody.innerHTML = '';
-            
-            // 更新上方初始本金顯示
-            displayCapitalEl.innerText = formatMoney(initialCapital);
-            
-            let runningBalance = initialCapital;
-
-            // 1. 依照日期排序 (舊到新)，確保餘額計算正確
-            transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            // 2. 預先計算每一筆的當下餘額與價差
-            const processedTxs = transactions.map((tx) => {
-                const buyAmt = Number(tx.buy);
-                const isSold = tx.sell !== "" && tx.sell !== null;
-                const sellAmt = isSold ? Number(tx.sell) : 0;
-                
-                // 計算邏輯：餘額 = 先前餘額 - 買進成本 + 賣出收入
-                runningBalance = runningBalance - buyAmt + sellAmt;
-
-                let profitDisplay = '<span class="text-gray-400">-</span>';
-                if (isSold) {
-                    const profit = sellAmt - buyAmt;
-                    if (profit > 0) {
-                        profitDisplay = `<span class="text-red-500 font-bold">+${formatMoney(profit)}</span>`;
-                    } else if (profit < 0) {
-                        profitDisplay = `<span class="text-green-500 font-bold">${formatMoney(profit)}</span>`;
-                    } else {
-                        profitDisplay = `<span class="text-gray-700 font-bold">${formatMoney(0)}</span>`;
-                    }
-                }
-
-                return {
-                    ...tx,
-                    buyAmt,
-                    isSold,
-                    sellAmt,
-                    profitDisplay,
-                    balanceAtTime: runningBalance
-                };
-            });
-
-            // 更新畫面上方的總餘額顯示
-            currentBalanceEl.innerText = formatMoney(runningBalance);
-            if(runningBalance < 0) {
-                currentBalanceEl.classList.replace('text-blue-600', 'text-red-600');
-            } else {
-                currentBalanceEl.classList.replace('text-red-600', 'text-blue-600');
-            }
-
-            // 判斷是否顯示空狀態或翻頁控制
-            if (processedTxs.length === 0) {
-                emptyState.classList.remove('hidden');
-                paginationControls.classList.add('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-                paginationControls.classList.remove('hidden');
-            }
-
-            // 3. 處理翻頁：將陣列反轉 (讓最新的日期排最上面)，然後切出當前頁面的資料
-            const reversedTxs = [...processedTxs].reverse();
-            const totalPages = Math.ceil(reversedTxs.length / itemsPerPage);
-            
-            // 防呆：確保當前頁碼沒有超出範圍
-            if (currentPage > totalPages) currentPage = totalPages;
-            if (currentPage < 1) currentPage = 1;
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const paginatedTxs = reversedTxs.slice(startIndex, startIndex + itemsPerPage);
-
-            // 4. 渲染當前頁面的資料
-            paginatedTxs.forEach((tx) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition";
-                tr.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${tx.date}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${tx.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">${formatMoney(tx.buyAmt)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">${tx.isSold ? formatMoney(tx.sellAmt) : '<span class="text-gray-400 text-xs">持有中</span>'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right">${tx.profitDisplay}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold ${tx.balanceAtTime < 0 ? 'text-red-600' : 'text-blue-600'}">${formatMoney(tx.balanceAtTime)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                        <button onclick="editTx('${tx.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">編輯</button>
-                        <button onclick="deleteTx('${tx.id}')" class="text-red-600 hover:text-red-900">刪除</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // 5. 更新翻頁按鈕與文字狀態
-            pageInfo.innerText = `顯示第 ${currentPage} 頁，共 ${totalPages} 頁 (總計 ${transactions.length} 筆)`;
-            btnPrev.disabled = currentPage === 1;
-            btnNext.disabled = currentPage === totalPages;
-        }
-
-        // 翻頁動作
-        window.changePage = function(offset) {
-            currentPage += offset;
-            renderTable();
-        }
-
-        // 儲存資料到 LocalStorage
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-            renderTable();
-        }
-
-        // 處理表單提交 (新增/修改)
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const id = document.getElementById('tx-id').value;
-            const date = document.getElementById('tx-date').value;
-            const name = document.getElementById('tx-name').value;
-            const buy = document.getElementById('tx-buy').value;
-            const sell = document.getElementById('tx-sell').value;
-
-            if (id) {
-                // 更新現有紀錄
-                const index = transactions.findIndex(t => t.id === id);
-                if (index !== -1) {
-                    transactions[index] = { id, date, name, buy, sell };
-                }
-            } else {
-                // 新增紀錄
-                const newTx = {
-                    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(), // 產生唯一ID
-                    date,
-                    name,
-                    buy,
-                    sell
-                };
-                transactions.push(newTx);
-            }
-
-            // 新增資料後，把頁碼切回第一頁看最新結果
-            currentPage = 1;
-            saveData();
-            resetForm();
-        });
-
-        // 刪除紀錄
-        window.deleteTx = function(id) {
-            if (confirm('確定要刪除這筆交易紀錄嗎？這將會重新計算餘額。')) {
-                transactions = transactions.filter(t => t.id !== id);
-                saveData();
-            }
-        }
-
-        // 編輯紀錄 (載入資料至表單)
-        window.editTx = function(id) {
-            const tx = transactions.find(t => t.id === id);
-            if (!tx) return;
-
-            document.getElementById('tx-id').value = tx.id;
-            document.getElementById('tx-date').value = tx.date;
-            document.getElementById('tx-name').value = tx.name;
-            document.getElementById('tx-buy').value = tx.buy;
-            document.getElementById('tx-sell').value = tx.sell;
-
-            formTitle.innerText = "編輯交易紀錄";
-            submitBtn.innerText = "儲存修改";
-            submitBtn.classList.replace('bg-blue-600', 'bg-green-600');
-            submitBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
-            cancelBtn.classList.remove('hidden');
-            cancelBtn.classList.add('block');
-            
-            // 滾動到表單位置
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // 重置表單狀態
-        window.resetForm = function() {
-            form.reset();
-            document.getElementById('tx-id').value = "";
-            document.getElementById('tx-date').valueAsDate = new Date();
-            
-            formTitle.innerText = "新增交易紀錄";
-            submitBtn.innerText = "新增紀錄";
-            submitBtn.classList.replace('bg-green-600', 'bg-blue-600');
-            submitBtn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
-            cancelBtn.classList.add('hidden');
-            cancelBtn.classList.remove('block');
-        }
-
-        // 執行初始化
-        init();
-    </script>
 </body>
 </html>
