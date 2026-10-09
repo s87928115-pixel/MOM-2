@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cherry 每日英文與識字學習卡</title>
+  <title>Cherry 英文作業學習卡 (五組單字完整版)</title>
   <style>
     :root {
       --bg-cream: #FAF7F2;
@@ -35,431 +35,346 @@
       margin: 0 auto;
     }
 
-    /* 頂部導航與日期 */
-    .top-bar {
+    .header-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 24px;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 20px;
+      border-bottom: 2px dashed var(--border-warm);
+      padding-bottom: 16px;
     }
 
     .site-title {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       color: var(--accent-deep);
       font-weight: 700;
     }
 
-    .date-badge {
-      background: var(--tag-bg);
-      color: var(--accent-deep);
+    .print-btn {
+      background: var(--accent-warm);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.95rem;
       font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      border: 1px solid var(--border-warm);
+      cursor: pointer;
+      transition: background 0.2s;
     }
 
-    /* 互動學習主卡片 */
-    .study-card {
+    .print-btn:hover {
+      background: var(--accent-deep);
+    }
+
+    .cards-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .flashcard {
       background: var(--card-bg);
       border: 2px solid var(--border-warm);
       border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 8px 24px rgba(169, 113, 75, 0.08);
-      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(169, 113, 75, 0.06);
+      page-break-after: always;
     }
 
-    .card-photo-wrapper {
+    /* 圖片容器：保證完整顯示整張圖，不切邊 */
+    .card-photo-box {
       width: 100%;
-      height: 340px;
-      background: #f0ebe4;
+      height: 320px;
+      background: #F2ECE4;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      padding: 12px;
       border-bottom: 2px solid var(--border-warm);
     }
 
-    .card-photo-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .card-photo-box img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* 完整顯示整張照片比例 */
+      border-radius: 8px;
     }
 
-    .card-content {
-      padding: 28px 32px;
+    .card-body {
+      padding: 24px 28px;
     }
 
-    .word-row {
+    .word-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
       border-bottom: 1.5px dashed var(--border-warm);
-      padding-bottom: 14px;
-      margin-bottom: 16px;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
     }
 
-    .english-word {
-      font-size: 2.8rem;
+    .word-text {
+      font-size: 2.6rem;
       font-weight: 800;
       color: #222;
-      letter-spacing: 0.5px;
     }
 
-    .word-tools {
+    .audio-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
-    .ipa-tag {
-      font-size: 1.35rem;
+    .ipa-badge {
+      font-size: 1.3rem;
       color: var(--accent-deep);
       font-family: "Lucida Sans Unicode", "DejaVu Sans", sans-serif;
       background: var(--tag-bg);
-      padding: 3px 10px;
-      border-radius: 8px;
+      padding: 4px 10px;
+      border-radius: 6px;
     }
 
     .speak-btn {
       background: var(--accent-warm);
       color: #fff;
       border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.95rem;
+      padding: 6px 12px;
+      border-radius: 6px;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: background 0.2s;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
 
-    .speak-btn:hover {
-      background: var(--accent-deep);
-    }
-
-    /* 中文注音直排 */
-    .chinese-box {
-      margin: 18px 0;
-      padding: 12px 18px;
+    .chinese-ruby-box {
+      margin: 14px 0;
+      padding: 10px 16px;
       background: #FDFBF8;
-      border-radius: 12px;
+      border-radius: 10px;
       border-left: 5px solid var(--accent-warm);
     }
 
     ruby {
-      font-size: 2.1rem;
+      font-size: 2rem;
       font-weight: 700;
       color: #2b2b2b;
       margin-right: 12px;
     }
 
     rt {
-      font-size: 0.75rem;
-      color: #777;
+      font-size: 0.72rem;
+      color: #666;
       font-weight: 500;
     }
 
-    .meta-list {
-      margin-top: 18px;
+    .details-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
+      margin-top: 14px;
     }
 
-    .meta-item {
+    .detail-item {
       display: flex;
-      gap: 12px;
-      font-size: 1.05rem;
+      gap: 10px;
+      font-size: 1rem;
       line-height: 1.5;
     }
 
     .badge {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       background: var(--accent-warm);
       color: #fff;
-      padding: 4px 8px;
+      padding: 3px 8px;
       border-radius: 6px;
       white-space: nowrap;
       height: fit-content;
     }
 
-    /* 切換與控制條 */
-    .controller-bar {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-    }
-
-    .ctrl-btn {
-      background: white;
-      border: 1.5px solid var(--accent-warm);
-      color: var(--accent-deep);
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .ctrl-btn:hover {
-      background: var(--accent-warm);
-      color: white;
-    }
-
-    /* 規格指引收合手風琴 */
-    details {
-      background: #fff;
-      border: 1px solid var(--border-warm);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-top: 24px;
-    }
-
-    summary {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--accent-deep);
-      cursor: pointer;
-      outline: none;
-    }
-
-    .doc-content {
-      margin-top: 16px;
-      border-top: 1px dashed var(--border-warm);
-      padding-top: 16px;
-      font-size: 0.95rem;
-    }
-
-    .doc-content h3 {
-      color: var(--accent-deep);
-      margin: 14px 0 6px 0;
-      font-size: 1.05rem;
-    }
-
-    .doc-content ul, .doc-content ol {
-      padding-left: 20px;
-      margin-bottom: 10px;
-    }
-
     @media print {
       body { background: #fff; padding: 0; }
-      .controller-bar, .speak-btn, details, .top-bar button { display: none !important; }
-      .study-card { border: none; box-shadow: none; }
-      .card-photo-wrapper { height: 260px; }
+      .header-bar button { display: none !important; }
+      .speak-btn { display: none !important; }
+      .flashcard { border: 1px solid #ccc; box-shadow: none; margin-bottom: 20px; }
+      .card-photo-box { height: 260px; background: #fff; }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- 頂部資訊列 -->
-    <div class="top-bar">
+    <div class="header-bar">
       <div>
-        <h1 class="site-title">Cherry 每日英文作業學習</h1>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">幼兒園大班 (5–6 歲) 雙語識字 & 自然發音</p>
+        <h1 class="site-title">Cherry 英文作業學習卡 (五組單字)</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">自然發音 Phonics ｜ 國語注音識字 ｜ 真實攝影</p>
       </div>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <span class="date-badge" id="today-text">今日學習</span>
-        <button class="ctrl-btn" style="padding: 6px 12px; font-size: 0.85rem;" onclick="window.print()">列印 A4 卡片</button>
-      </div>
+      <button class="print-btn" onclick="window.print()">🖨️ 列印 A4 單字卡</button>
     </div>
 
-    <!-- 學習卡本體 (七項規格完全對齊) -->
-    <div class="study-card">
-      <!-- 1. 寫實圖片 -->
-      <div class="card-photo-wrapper">
-        <img id="card-img" src="" alt="真實寫實照片">
-      </div>
+    <div class="cards-wrapper">
 
-      <div class="card-content">
-        <!-- 2. 英文單字 & 3. IPA 音標 -->
-        <div class="word-row">
-          <div class="english-word" id="card-word">cat</div>
-          <div class="word-tools">
-            <span class="ipa-tag" id="card-ipa">/kæt/</span>
-            <button class="speak-btn" onclick="playAudio()">🔊 聽發音</button>
-          </div>
+      <!-- 1. apple -->
+      <div class="flashcard">
+        <div class="card-photo-box">
+          <img src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcROjLmN6eB-WbUfspo9IsKks6U3opSDsl8lO9l_cmdtQl6z6JUwB9pdq5zwVW6f5OmB-DNq5lU5byVuzjw" alt="apple 寫實照片">
         </div>
-
-        <!-- 4. 繁體中文 & 5. 國語注音 (符合教育部標準聲調) -->
-        <div class="chinese-box" id="card-chinese">
-          <!-- 動態注入 ruby 標籤 -->
-        </div>
-
-        <div class="meta-list">
-          <!-- 6. 英翻英解釋 (幼兒友善) -->
-          <div class="meta-item">
-            <span class="badge">英文解釋</span>
-            <span id="card-en-def">a small animal often kept as a pet</span>
+        <div class="card-body">
+          <div class="word-header">
+            <div class="word-text">apple</div>
+            <div class="audio-group">
+              <span class="ipa-badge">/ˈæp.əl/</span>
+              <button class="speak-btn" onclick="playAudio('apple')">🔊 聽發音</button>
+            </div>
           </div>
-
-          <!-- 7. 注意事項 (Phonics & 識字提示) -->
-          <div class="meta-item">
-            <span class="badge">學習重點</span>
-            <span id="card-tips">字母 a 發短母音 /æ/，下巴放鬆、嘴巴向左右兩側張開。</span>
+          <div class="chinese-ruby-box">
+            <ruby>蘋<rt>ㄆㄧㄥˊ</rt></ruby><ruby>果<rt>ㄍㄨㄛˇ</rt></ruby>
+          </div>
+          <div class="details-list">
+            <div class="detail-item">
+              <span class="badge">英文解釋</span>
+              <span>a round fruit with firm red or green skin</span>
+            </div>
+            <div class="detail-item">
+              <span class="badge">學習重點</span>
+              <span>字母 <strong>a</strong> 發短母音 <strong>/æ/</strong>，下巴微開，尾音 <strong>le</strong> 舌尖輕觸上牙齦。</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 切換與互動控制列 -->
-    <div class="controller-bar">
-      <button class="ctrl-btn" onclick="prevWord()">⬅ 上一個單字</button>
-      <button class="ctrl-btn" onclick="loadTodayWord()">📅 回到今日單字</button>
-      <button class="ctrl-btn" onclick="randomWord()">🎲 隨機抽考</button>
-      <button class="ctrl-btn" onclick="nextWord()">下一個單字 ➡</button>
-    </div>
-
-    <!-- 專案固定指令書 (展開即可隨時查看與印出) -->
-    <details>
-      <summary>點擊展開：專案固定指令與製作規格書</summary>
-      <div class="doc-content">
-        <h3>一、學習目標</h3>
-        <p>協助 Cherry（幼兒園大班）學習英文單字，同時練習繁體中文字形與國語注音。以圖片聯想、自然發音、中文識字為主，不強迫死背。</p>
-
-        <h3>二、固定七項單字卡格式</h3>
-        <ol>
-          <li>寫實圖片：真實攝影風格，意象具體清晰，不使用卡通畫。</li>
-          <li>英文單字：幼兒友善大字體。</li>
-          <li>英文 IPA 音標：正確美式發音。</li>
-          <li>繁體中文意思：台灣常見且適合兒童理解之詞彙。</li>
-          <li>中文國語注音：教育部標準注音與完整聲調。</li>
-          <li>英翻英解釋：幼兒可理解的淺白英文短句。</li>
-          <li>注意事項：自然發音規則、短母音/長母音或識字重點。</li>
-        </ol>
-
-        <h3>三、發音與標記規則</h3>
-        <ul>
-          <li>英文發音嚴格使用 IPA，絕不使用中文或注音諧音模擬英文發音。</li>
-          <li>中文注音緊貼繁體漢字旁，方便對照識字。</li>
-        </ul>
-
-        <h3>四、每日教學建議步驟</h3>
-        <p>看圖片 → 說英文 → 聽正確發音 → 理解英文意思 → 認識繁體中文 → 練習國語注音 → 簡單複習問答。</p>
+      <!-- 2. dog -->
+      <div class="flashcard">
+        <div class="card-photo-box">
+          <img src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSXTDujJtR4AWLUI3bYNLiJ8pTX2cA3Y76sW_85WJaQ-40rS4-4M1BFY1lTQv7At5MtQjffxHCaJ1uBMKc" alt="dog 寫實照片">
+        </div>
+        <div class="card-body">
+          <div class="word-header">
+            <div class="word-text">dog</div>
+            <div class="audio-group">
+              <span class="ipa-badge">/dɔːɡ/</span>
+              <button class="speak-btn" onclick="playAudio('dog')">🔊 聽發音</button>
+            </div>
+          </div>
+          <div class="chinese-ruby-box">
+            <ruby>狗<rt>ㄍㄡˇ</rt></ruby>
+          </div>
+          <div class="details-list">
+            <div class="detail-item">
+              <span class="badge">英文解釋</span>
+              <span>a friendly pet animal with four legs that barks</span>
+            </div>
+            <div class="detail-item">
+              <span class="badge">學習重點</span>
+              <span>開頭 <strong>d</strong> 輕吐氣，字母 <strong>o</strong> 嘴型成圓形發 <strong>/ɔː/</strong>，尾音 <strong>g</strong> 有聲喉嚨震動。</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </details>
+
+      <!-- 3. pan -->
+      <div class="flashcard">
+        <div class="card-photo-box">
+          <img src="https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcQeNHRvP4k8rhZjMxOeFd8y4A8QicHctEU3XLcximLuWhDOWuHW2DZ60jCCxt1qWyUWZNlrorteG6AuIJE" alt="pan 寫實照片">
+        </div>
+        <div class="card-body">
+          <div class="word-header">
+            <div class="word-text">pan</div>
+            <div class="audio-group">
+              <span class="ipa-badge">/pæn/</span>
+              <button class="speak-btn" onclick="playAudio('pan')">🔊 聽發音</button>
+            </div>
+          </div>
+          <div class="chinese-ruby-box">
+            <ruby>平<rt>ㄆㄧㄥˊ</rt></ruby><ruby>底<rt>ㄉㄧˇ</rt></ruby><ruby>鍋<rt>ㄍㄨㄛ</rt></ruby>
+          </div>
+          <div class="details-list">
+            <div class="detail-item">
+              <span class="badge">英文解釋</span>
+              <span>a metal container with a handle used for cooking</span>
+            </div>
+            <div class="detail-item">
+              <span class="badge">學習重點</span>
+              <span><strong>p</strong> 是雙唇爆破音，<strong>a</strong> 發短母音 <strong>/æ/</strong>，與 apple、cat 同屬短母音組。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. banana -->
+      <div class="flashcard">
+        <div class="card-photo-box">
+          <img src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcSMKFMslRvdl_fW0phj3ELpsZ2Nyt_pMgwrD4c_XUbLNWYUtbojO-4puss2ixjpNtzIBDkXzfCN8l6HLdU" alt="banana 寫實照片">
+        </div>
+        <div class="card-body">
+          <div class="word-header">
+            <div class="word-text">banana</div>
+            <div class="audio-group">
+              <span class="ipa-badge">/bəˈnæn.ə/</span>
+              <button class="speak-btn" onclick="playAudio('banana')">🔊 聽發音</button>
+            </div>
+          </div>
+          <div class="chinese-ruby-box">
+            <ruby>香<rt>ㄒㄧㄤ</rt></ruby><ruby>蕉<rt>ㄐㄧㄠ</rt></ruby>
+          </div>
+          <div class="details-list">
+            <div class="detail-item">
+              <span class="badge">英文解釋</span>
+              <span>a long curved fruit with a yellow skin</span>
+            </div>
+            <div class="detail-item">
+              <span class="badge">學習重點</span>
+              <span>重音在中間的 <strong>na</strong>，中間的 <strong>a</strong> 發短母音 <strong>/æ/</strong>，前後字母 <strong>a</strong> 發輕聲 /ə/。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. water -->
+      <div class="flashcard">
+        <div class="card-photo-box">
+          <img src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSgmv0zFJq_SwBA8kZDDGshlOcGQo50WmFy4JCgTfyhkJOgujypsOcqsF8aaIRcQS_LhkL3bHkwMAp84KU" alt="water 寫實照片">
+        </div>
+        <div class="card-body">
+          <div class="word-header">
+            <div class="word-text">water</div>
+            <div class="audio-group">
+              <span class="ipa-badge">/ˈwɑː.t̬ɚ/</span>
+              <button class="speak-btn" onclick="playAudio('water')">🔊 聽發音</button>
+            </div>
+          </div>
+          <div class="chinese-ruby-box">
+            <ruby>水<rt>ㄕㄨㄟˇ</rt></ruby>
+          </div>
+          <div class="details-list">
+            <div class="detail-item">
+              <span class="badge">英文解釋</span>
+              <span>the clear liquid that without color or smell that we drink</span>
+            </div>
+            <div class="detail-item">
+              <span class="badge">學習重點</span>
+              <span>美式發音中 <strong>t</strong> 處於母音間會轉為彈舌音（Flap T），結尾 <strong>er</strong> 帶有明顯捲舌音。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <script>
-    // 預設資料庫（可隨時在後續上傳作業時擴充增加）
-    const wordDatabase = [
-      {
-        word: "cat",
-        ipa: "/kæt/",
-        chineseRuby: "<ruby>貓<rt>ㄇㄠ</rt></ruby>",
-        enDef: "a small animal often kept as a pet",
-        tips: "字母 a 發短母音 /æ/，嘴唇向兩側拉開，像在笑一樣。",
-        imgUrl: "https://static.vecteezy.com/system/resources/previews/018/964/873/large_2x/big-red-cat-sitting-and-looking-forward-photo.jpg"
-      },
-      {
-        word: "apple",
-        ipa: "/ˈæp.əl/",
-        chineseRuby: "<ruby>蘋<rt>ㄆㄧㄥˊ</rt></ruby><ruby>果<rt>ㄍㄨㄛˇ</rt></ruby>",
-        enDef: "a round fruit with red or green skin",
-        tips: "開頭 a 發短母音 /æ/，結尾 le 舌尖輕輕頂到上牙齦。",
-        imgUrl: "https://static.vecteezy.com/system/resources/previews/074/059/240/non_2x/fresh-red-ripe-apple-on-clean-white-background-photo.jpg"
-      },
-      {
-        word: "pan",
-        ipa: "/pæn/",
-        chineseRuby: "<ruby>平<rt>ㄆㄧㄥˊ</rt></ruby><ruby>底<rt>ㄉㄧˇ</rt></ruby><ruby>鍋<rt>ㄍㄨㄛ</rt></ruby>",
-        enDef: "a shallow pan used for cooking food",
-        tips: "開頭 p 輕輕爆破吐氣，字母 a 同樣發短母音 /æ/。",
-        imgUrl: "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        word: "dog",
-        ipa: "/dɔːɡ/",
-        chineseRuby: "<ruby>狗<rt>ㄍㄡˇ</rt></ruby>",
-        enDef: "a friendly animal that barks and likes to play",
-        tips: "字母 o 發嘴型圓圓的 /ɔː/，尾音 g 喉嚨輕輕震動。",
-        imgUrl: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        word: "sun",
-        ipa: "/sʌn/",
-        chineseRuby: "<ruby>太<rt>ㄊㄞˋ</rt></ruby><ruby>陽<rt>ㄧㄤˊ</rt></ruby>",
-        enDef: "the bright star in the sky that gives us light and warmth",
-        tips: "字母 u 發短音 /ʌ/，嘴巴自然微開，短促有力。",
-        imgUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
-      }
-    ];
-
-    let currentIndex = 0;
-
-    // 依當前年份日期（Day of Year）自動計算「今日單字」
-    function getTodayWordIndex() {
-      const now = new Date();
-      const start = new Date(now.getFullYear(), 0, 0);
-      const diff = now - start;
-      const oneDay = 1000 * 60 * 60 * 24;
-      const dayOfYear = Math.floor(diff / oneDay);
-      return dayOfYear % wordDatabase.length;
-    }
-
-    // 渲染卡片到畫面上
-    function renderCard(index) {
-      currentIndex = index;
-      const data = wordDatabase[currentIndex];
-      
-      document.getElementById('card-word').textContent = data.word;
-      document.getElementById('card-ipa').textContent = data.ipa;
-      document.getElementById('card-chinese').innerHTML = data.chineseRuby;
-      document.getElementById('card-en-def').textContent = data.enDef;
-      document.getElementById('card-tips').textContent = data.tips;
-      document.getElementById('card-img').src = data.imgUrl;
-      document.getElementById('card-img').alt = data.word;
-    }
-
-    // 瀏覽器美式發音功能
-    function playAudio() {
-      const currentWord = wordDatabase[currentIndex].word;
+    function playAudio(word) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(currentWord);
+        const utterance = new SpeechSynthesisUtterance(word);
         utterance.lang = 'en-US';
-        utterance.rate = 0.85; // 稍微放慢語速，適合幼兒辨音
+        utterance.rate = 0.85; // 專為兒童辨音設計的微慢速美音
         window.speechSynthesis.speak(utterance);
-      } else {
-        alert('您的瀏覽器暫不支援自動語音播放功能。');
       }
     }
-
-    function nextWord() {
-      renderCard((currentIndex + 1) % wordDatabase.length);
-    }
-
-    function prevWord() {
-      renderCard((currentIndex - 1 + wordDatabase.length) % wordDatabase.length);
-    }
-
-    function randomWord() {
-      let rand = Math.floor(Math.random() * wordDatabase.length);
-      renderCard(rand);
-    }
-
-    function loadTodayWord() {
-      const todayIdx = getTodayWordIndex();
-      renderCard(todayIdx);
-    }
-
-    // 頁面載入初始化
-    window.addEventListener('DOMContentLoaded', () => {
-      const today = new Date();
-      const dateString = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
-      document.getElementById('today-text').textContent = `📅 ${dateString} 學習`;
-      loadTodayWord();
-    });
   </script>
 </body>
 </html>
