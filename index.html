@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cherry 每日英文作業學習卡 (每日10字 · 每頁5字)</title>
+  <title>Cherry 每日英文作業學習卡 (語音釋義與每日自動隨機版)</title>
   <style>
     :root {
       --bg-cream: #FAF7F2;
@@ -35,7 +35,7 @@
       margin: 0 auto;
     }
 
-    /* 頂部功能列 */
+    /* 頂部控制列 */
     .header-bar {
       display: flex;
       justify-content: space-between;
@@ -65,7 +65,6 @@
       margin-top: 4px;
     }
 
-    /* 操作按鈕群 */
     .ctrl-group {
       display: flex;
       align-items: center;
@@ -102,6 +101,7 @@
       background: var(--tag-bg);
     }
 
+    /* 分頁標籤切換 */
     .page-tab-bar {
       display: flex;
       justify-content: center;
@@ -127,7 +127,7 @@
       border-color: var(--accent-deep);
     }
 
-    /* 單字卡容器 */
+    /* 單字卡 */
     .cards-wrapper {
       display: flex;
       flex-direction: column;
@@ -142,10 +142,10 @@
       box-shadow: 0 4px 14px rgba(169, 113, 75, 0.05);
     }
 
-    /* 照片容器：保持原圖比例完整居中，不切邊 */
+    /* 圖片完整顯示（不切邊、不縮扁） */
     .card-photo-box {
       width: 100%;
-      height: 280px;
+      height: 300px;
       background: #F4EFEA;
       display: flex;
       align-items: center;
@@ -162,7 +162,7 @@
     }
 
     .card-body {
-      padding: 20px 24px;
+      padding: 22px 26px;
     }
 
     .word-header {
@@ -209,6 +209,7 @@
       border-radius: 6px;
     }
 
+    /* 語音按鈕 */
     .speak-btn {
       background: var(--accent-warm);
       color: #fff;
@@ -218,12 +219,31 @@
       cursor: pointer;
       font-size: 0.9rem;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.2s;
     }
 
     .speak-btn:hover {
       background: var(--accent-deep);
     }
 
+    .speak-btn-sm {
+      padding: 3px 8px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      background: #EADBC8;
+      color: #55351E;
+      margin-left: 6px;
+    }
+
+    .speak-btn-sm:hover {
+      background: var(--accent-warm);
+      color: #fff;
+    }
+
+    /* 中文直排注音標記 */
     .chinese-ruby-box {
       margin: 10px 0 14px 0;
       padding: 8px 14px;
@@ -248,14 +268,15 @@
     .details-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .detail-item {
       display: flex;
-      gap: 8px;
-      font-size: 0.95rem;
-      line-height: 1.45;
+      gap: 10px;
+      font-size: 0.98rem;
+      line-height: 1.5;
+      align-items: baseline;
     }
 
     .badge {
@@ -263,16 +284,16 @@
       font-weight: 700;
       background: var(--accent-warm);
       color: #fff;
-      padding: 2px 7px;
+      padding: 3px 7px;
       border-radius: 5px;
       white-space: nowrap;
       height: fit-content;
     }
 
-    /* 列印專用樣式：強制第 1~5 個在第 1 頁，第 6~10 個在第 2 頁 */
+    /* 列印格式排版 */
     @media print {
       body { background: #fff; padding: 0; }
-      .header-bar button, .ctrl-group, .page-tab-bar, .speak-btn { display: none !important; }
+      .header-bar button, .ctrl-group, .page-tab-bar, .speak-btn, .speak-btn-sm { display: none !important; }
       .container { max-width: 100%; }
       .cards-wrapper { display: block !important; }
       .card-item { display: block !important; margin-bottom: 16px; page-break-inside: avoid; }
@@ -291,6 +312,7 @@
         <div class="date-badge" id="date-display">載入中...</div>
       </div>
       <div class="ctrl-group">
+        <button class="btn btn-outline" onclick="randomNewBatch()">🎲 隨機換一組</button>
         <button class="btn btn-outline" onclick="changeDayOffset(-1)">⬅ 前一天</button>
         <button class="btn btn-outline" onclick="resetToday()">📅 回今天</button>
         <button class="btn btn-outline" onclick="changeDayOffset(1)">後一天 ➡</button>
@@ -298,20 +320,20 @@
       </div>
     </div>
 
-    <!-- 分頁切換 (一頁5個單字) -->
+    <!-- 分頁切換 (一頁 5 個單字) -->
     <div class="page-tab-bar">
       <button class="tab-btn active" id="tab-p1" onclick="switchPage(1)">第一頁（單字 1～5）</button>
       <button class="tab-btn" id="tab-p2" onclick="switchPage(2)">第二頁（單字 6～10）</button>
     </div>
 
-    <!-- 10 張卡片渲染容器 -->
+    <!-- 10 張單字卡渲染容器 -->
     <div class="cards-wrapper" id="cards-container">
-      <!-- 由 JS 動態生成 10 個卡片 -->
+      <!-- 由 JS 動態生成 -->
     </div>
   </div>
 
   <script>
-    // 題庫資料庫（真實高清攝影圖、教育部注音、美式 IPA、Phonics 重點）
+    // 擴充字庫池（生活常見高頻單字、美式 IPA、教育部注音、寫實照片）
     const masterWordList = [
       { word: "apple", ipa: "/ˈæp.əl/", ruby: "<ruby>蘋<rt>ㄆㄧㄥˊ</rt></ruby><ruby>果<rt>ㄍㄨㄛˇ</rt></ruby>", enDef: "a round fruit with red or green skin", tips: "字母 a 發短母音 /æ/，下巴放鬆張開。", img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcROjLmN6eB-WbUfspo9IsKks6U3opSDsl8lO9l_cmdtQl6z6JUwB9pdq5zwVW6f5OmB-DNq5lU5byVuzjw" },
       { word: "dog", ipa: "/dɔːɡ/", ruby: "<ruby>狗<rt>ㄍㄡˇ</rt></ruby>", enDef: "a friendly pet animal that barks", tips: "字母 o 發圓唇音 /ɔː/，字尾 g 聲帶震動。", img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSXTDujJtR4AWLUI3bYNLiJ8pTX2cA3Y76sW_85WJaQ-40rS4-4M1BFY1lTQv7At5MtQjffxHCaJ1uBMKc" },
@@ -320,40 +342,53 @@
       { word: "water", ipa: "/ˈwɑː.t̬ɚ/", ruby: "<ruby>水<rt>ㄕㄨㄟˇ</rt></ruby>", enDef: "the clear liquid we drink every day", tips: "美式發音中的 t 在母音間念輕快彈舌音。", img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSgmv0zFJq_SwBA8kZDDGshlOcGQo50WmFy4JCgTfyhkJOgujypsOcqsF8aaIRcQS_LhkL3bHkwMAp84KU" },
       { word: "cat", ipa: "/kæt/", ruby: "<ruby>貓<rt>ㄇㄠ</rt></ruby>", enDef: "a small pet that makes a meow sound", tips: "c 發 /k/，中間 a 發短母音 /æ/，結尾輕頓音 t。", img: "https://static.vecteezy.com/system/resources/previews/018/964/873/large_2x/big-red-cat-sitting-and-looking-forward-photo.jpg" },
       { word: "sun", ipa: "/sʌn/", ruby: "<ruby>太<rt>ㄊㄞˋ</rt></ruby><ruby>陽<rt>ㄧㄤˊ</rt></ruby>", enDef: "the bright star in the sky that gives us light", tips: "字母 u 發短音 /ʌ/，嘴巴自然微張，短促有力。", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" },
-      { word: "hat", ipa: "/hæt/", ruby: "<ruby>帽<rt>ㄇㄠˋ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "something you wear on your head", tips: "h 是吐氣音，與 cat、pan 同為 -at 押韻字族。", img: "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=800&q=80" },
-      { word: "cup", ipa: "/kʌp/", ruby: "<ruby>杯<rt>ㄅㄟ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a small container used for drinking tea or milk", tips: "c 發 /k/，u 發短促音 /ʌ/，尾音雙唇閉合。", img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80" },
+      { word: "hat", ipa: "/hæt/", ruby: "<ruby>帽<rt>ㄇㄠˋ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "something you wear on your head to stay warm", tips: "h 是吐氣音，與 cat、pan 同為 -at 押韻字族。", img: "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=800&q=80" },
+      { word: "cup", ipa: "/kʌp/", ruby: "<ruby>杯<rt>ㄅㄟ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a small container used for drinking warm milk", tips: "c 發 /k/，u 發短促音 /ʌ/，尾音雙唇閉合。", img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80" },
       { word: "bed", ipa: "/bed/", ruby: "<ruby>床<rt>ㄔㄨㄤˊ</rt></ruby>", enDef: "a piece of furniture you sleep on at night", tips: "b 輕濁音，e 發短母音 /e/，注意與 d 的方向區分。", img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80" },
       { word: "fish", ipa: "/fɪʃ/", ruby: "<ruby>魚<rt>ㄩˊ</rt></ruby>", enDef: "an animal that lives and swims in water", tips: "開頭 f 上牙輕咬下唇，字尾 sh 發氣音 /ʃ/。", img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80" },
-      { word: "book", ipa: "/bʊk/", ruby: "<ruby>書<rt>ㄕㄨ</rt></ruby>", enDef: "pages with words and pictures to read", tips: "雙字母 oo 這裡發短音 /ʊ/，嘴唇稍放鬆往前撅。", img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80" }
+      { word: "book", ipa: "/bʊk/", ruby: "<ruby>書<rt>ㄕㄨ</rt></ruby>", enDef: "pages with words and colorful pictures to read", tips: "雙字母 oo 這裡發短音 /ʊ/，嘴唇放鬆微撅。", img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80" },
+      { word: "duck", ipa: "/dʌk/", ruby: "<ruby>鴨<rt>ㄧㄚ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a water bird with webbed feet that says quack", tips: "字母 u 發 /ʌ/，結尾 ck 發清脆的 /k/。", img: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=800&q=80" },
+      { word: "milk", ipa: "/mɪlk/", ruby: "<ruby>牛<rt>ㄋㄧㄡˊ</rt></ruby><ruby>奶<rt>ㄋㄞˇ</rt></ruby>", enDef: "a white drink that comes from cows and goats", tips: "i 發短音 /ɪ/，字尾 l-k 舌尖抵上牙齦後帶爆破。", img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80" },
+      { word: "tree", ipa: "/triː/", ruby: "<ruby>樹<rt>ㄕㄨˋ</rt></ruby><ruby>木<rt>ㄇㄨˋ</rt></ruby>", enDef: "a tall plant with a wooden trunk and green leaves", tips: "tr 是子音群 /tr/，雙字母 ee 發長音 /iː/。", img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80" },
+      { word: "bird", ipa: "/bɝːd/", ruby: "<ruby>小<rt>ㄒㄧㄠˇ</rt></ruby><ruby>鳥<rt>ㄋㄧㄠˇ</rt></ruby>", enDef: "an animal with feathers and wings that can fly", tips: "ir 發捲舌音 /ɝː/，舌頭往後上方捲起。", img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=800&q=80" }
     ];
 
     let dayOffset = 0;
     let currentPage = 1;
     let current10Words = [];
+    let customRandomSeed = null;
 
-    // 依天數計算 10 個不重複的每日單字
+    // 擬隨機演算法：依據日期種子產生每天固定但不同天的隨機分佈
+    function seededRandom(seed) {
+      const x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    }
+
     function getWordsForDay(offset) {
       const targetDate = new Date();
       targetDate.setDate(targetDate.getDate() + offset);
 
-      const dayNumber = Math.floor(targetDate.getTime() / (1000 * 60 * 60 * 24));
-      const totalWords = masterWordList.length;
-      
-      const startIndex = (dayNumber * 3) % totalWords;
-      const selected = [];
-      for (let i = 0; i < 10; i++) {
-        selected.push(masterWordList[(startIndex + i) % totalWords]);
+      // 日期種子數
+      const dateSeed = customRandomSeed !== null ? customRandomSeed : 
+        (targetDate.getFullYear() * 10000 + (targetDate.getMonth() + 1) * 100 + targetDate.getDate());
+
+      // 洗牌演算法
+      let pool = [...masterWordList];
+      let seed = dateSeed;
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(seededRandom(seed++) * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
       }
-      return { words: selected, date: targetDate };
+
+      return { words: pool.slice(0, 10), date: targetDate };
     }
 
     function renderDay() {
       const { words, date } = getWordsForDay(dayOffset);
       current10Words = words;
 
-      // 日期標籤
       const dateStr = `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`;
-      document.getElementById('date-display').textContent = `📅 ${dateStr} 今日 10 單字`;
+      document.getElementById('date-display').textContent = `📅 ${dateStr} 今日隨機 10 單字`;
 
       const container = document.getElementById('cards-container');
       container.innerHTML = '';
@@ -366,7 +401,6 @@
         card.className = `flashcard card-item page-${pageNumber} ${cardIndex === 5 ? 'print-page-break' : ''}`;
         card.id = `card-${cardIndex}`;
 
-        // 初始依分頁顯示/隱藏
         if (pageNumber !== currentPage) {
           card.style.display = 'none';
         }
@@ -383,7 +417,7 @@
               </div>
               <div class="audio-group">
                 <span class="ipa-badge">${item.ipa}</span>
-                <button class="speak-btn" onclick="playAudio('${item.word}')">🔊 聽發音</button>
+                <button class="speak-btn" onclick="playAudio('${escapeQuotes(item.word)}')">🔊 聽單字</button>
               </div>
             </div>
             <div class="chinese-ruby-box">
@@ -392,7 +426,10 @@
             <div class="details-list">
               <div class="detail-item">
                 <span class="badge">英文解釋</span>
-                <span>${item.enDef}</span>
+                <span>
+                  ${item.enDef}
+                  <button class="speak-btn speak-btn-sm" onclick="playAudio('${escapeQuotes(item.enDef)}')">🔊 念整句</button>
+                </span>
               </div>
               <div class="detail-item">
                 <span class="badge">學習重點</span>
@@ -403,6 +440,23 @@
         `;
         container.appendChild(card);
       });
+    }
+
+    function escapeQuotes(str) {
+      return str.replace(/'/g, "\\'");
+    }
+
+    // 瀏覽器美語語音播放（單字與句子皆適用）
+    function playAudio(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.82; // 稍微放慢速度，便於兒童清楚辨識自然發音
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert('您的瀏覽器目前未開啟語音播放支援。');
+      }
     }
 
     function switchPage(page) {
@@ -421,25 +475,23 @@
     }
 
     function changeDayOffset(delta) {
+      customRandomSeed = null;
       dayOffset += delta;
       renderDay();
       switchPage(1);
     }
 
     function resetToday() {
+      customRandomSeed = null;
       dayOffset = 0;
       renderDay();
       switchPage(1);
     }
 
-    function playAudio(word) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.85; // 專為幼童辨音調整的美語微慢速
-        window.speechSynthesis.speak(utterance);
-      }
+    function randomNewBatch() {
+      customRandomSeed = Math.floor(Math.random() * 1000000);
+      renderDay();
+      switchPage(1);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
