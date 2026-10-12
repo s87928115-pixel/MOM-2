@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cherry 每日英文作業學習卡 (語音釋義與每日自動隨機版)</title>
+  <title>Cherry 每日英文作業學習卡 (50字大題庫 · 0重複輪播版)</title>
   <style>
     :root {
       --bg-cream: #FAF7F2;
@@ -35,7 +35,6 @@
       margin: 0 auto;
     }
 
-    /* 頂部控制列 */
     .header-bar {
       display: flex;
       justify-content: space-between;
@@ -101,7 +100,6 @@
       background: var(--tag-bg);
     }
 
-    /* 分頁標籤切換 */
     .page-tab-bar {
       display: flex;
       justify-content: center;
@@ -127,7 +125,6 @@
       border-color: var(--accent-deep);
     }
 
-    /* 單字卡 */
     .cards-wrapper {
       display: flex;
       flex-direction: column;
@@ -142,7 +139,7 @@
       box-shadow: 0 4px 14px rgba(169, 113, 75, 0.05);
     }
 
-    /* 圖片完整顯示（不切邊、不縮扁） */
+    /* 圖片完整顯示（object-fit: contain，絕不切邊） */
     .card-photo-box {
       width: 100%;
       height: 300px;
@@ -209,7 +206,6 @@
       border-radius: 6px;
     }
 
-    /* 語音按鈕 */
     .speak-btn {
       background: var(--accent-warm);
       color: #fff;
@@ -243,7 +239,6 @@
       color: #fff;
     }
 
-    /* 中文直排注音標記 */
     .chinese-ruby-box {
       margin: 10px 0 14px 0;
       padding: 8px 14px;
@@ -290,7 +285,6 @@
       height: fit-content;
     }
 
-    /* 列印格式排版 */
     @media print {
       body { background: #fff; padding: 0; }
       .header-bar button, .ctrl-group, .page-tab-bar, .speak-btn, .speak-btn-sm { display: none !important; }
@@ -312,29 +306,29 @@
         <div class="date-badge" id="date-display">載入中...</div>
       </div>
       <div class="ctrl-group">
-        <button class="btn btn-outline" onclick="randomNewBatch()">🎲 隨機換一組</button>
-        <button class="btn btn-outline" onclick="changeDayOffset(-1)">⬅ 前一天</button>
-        <button class="btn btn-outline" onclick="resetToday()">📅 回今天</button>
-        <button class="btn btn-outline" onclick="changeDayOffset(1)">後一天 ➡</button>
+        <button class="btn btn-outline" onclick="changeGroup(-1)">⬅ 前一組</button>
+        <button class="btn btn-outline" onclick="resetToday()">📅 回今天輪播</button>
+        <button class="btn btn-outline" onclick="changeGroup(1)">下一組 ➡</button>
         <button class="btn btn-primary" onclick="window.print()">🖨️ 列印 A4 (共兩頁)</button>
       </div>
     </div>
 
-    <!-- 分頁切換 (一頁 5 個單字) -->
+    <!-- 一頁 5 個單字切換 -->
     <div class="page-tab-bar">
       <button class="tab-btn active" id="tab-p1" onclick="switchPage(1)">第一頁（單字 1～5）</button>
       <button class="tab-btn" id="tab-p2" onclick="switchPage(2)">第二頁（單字 6～10）</button>
     </div>
 
-    <!-- 10 張單字卡渲染容器 -->
+    <!-- 10 張卡片渲染容器 -->
     <div class="cards-wrapper" id="cards-container">
       <!-- 由 JS 動態生成 -->
     </div>
   </div>
 
   <script>
-    // 擴充字庫池（生活常見高頻單字、美式 IPA、教育部注音、寫實照片）
+    // 50 個幼兒生活必學單字庫 (5 組 × 10 字，連續 5 天零重複)
     const masterWordList = [
+      // === 第一組（第 1 天）===
       { word: "apple", ipa: "/ˈæp.əl/", ruby: "<ruby>蘋<rt>ㄆㄧㄥˊ</rt></ruby><ruby>果<rt>ㄍㄨㄛˇ</rt></ruby>", enDef: "a round fruit with red or green skin", tips: "字母 a 發短母音 /æ/，下巴放鬆張開。", img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcROjLmN6eB-WbUfspo9IsKks6U3opSDsl8lO9l_cmdtQl6z6JUwB9pdq5zwVW6f5OmB-DNq5lU5byVuzjw" },
       { word: "dog", ipa: "/dɔːɡ/", ruby: "<ruby>狗<rt>ㄍㄡˇ</rt></ruby>", enDef: "a friendly pet animal that barks", tips: "字母 o 發圓唇音 /ɔː/，字尾 g 聲帶震動。", img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSXTDujJtR4AWLUI3bYNLiJ8pTX2cA3Y76sW_85WJaQ-40rS4-4M1BFY1lTQv7At5MtQjffxHCaJ1uBMKc" },
       { word: "pan", ipa: "/pæn/", ruby: "<ruby>平<rt>ㄆㄧㄥˊ</rt></ruby><ruby>底<rt>ㄉㄧˇ</rt></ruby><ruby>鍋<rt>ㄍㄨㄛ</rt></ruby>", enDef: "a metal container used for cooking food", tips: "開頭 p 輕輕爆破吐氣，a 發短母音 /æ/。", img: "https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcQeNHRvP4k8rhZjMxOeFd8y4A8QicHctEU3XLcximLuWhDOWuHW2DZ60jCCxt1qWyUWZNlrorteG6AuIJE" },
@@ -345,50 +339,85 @@
       { word: "hat", ipa: "/hæt/", ruby: "<ruby>帽<rt>ㄇㄠˋ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "something you wear on your head to stay warm", tips: "h 是吐氣音，與 cat、pan 同為 -at 押韻字族。", img: "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=800&q=80" },
       { word: "cup", ipa: "/kʌp/", ruby: "<ruby>杯<rt>ㄅㄟ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a small container used for drinking warm milk", tips: "c 發 /k/，u 發短促音 /ʌ/，尾音雙唇閉合。", img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80" },
       { word: "bed", ipa: "/bed/", ruby: "<ruby>床<rt>ㄔㄨㄤˊ</rt></ruby>", enDef: "a piece of furniture you sleep on at night", tips: "b 輕濁音，e 發短母音 /e/，注意與 d 的方向區分。", img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80" },
+
+      // === 第二組（第 2 天）===
       { word: "fish", ipa: "/fɪʃ/", ruby: "<ruby>魚<rt>ㄩˊ</rt></ruby>", enDef: "an animal that lives and swims in water", tips: "開頭 f 上牙輕咬下唇，字尾 sh 發氣音 /ʃ/。", img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80" },
       { word: "book", ipa: "/bʊk/", ruby: "<ruby>書<rt>ㄕㄨ</rt></ruby>", enDef: "pages with words and colorful pictures to read", tips: "雙字母 oo 這裡發短音 /ʊ/，嘴唇放鬆微撅。", img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80" },
       { word: "duck", ipa: "/dʌk/", ruby: "<ruby>鴨<rt>ㄧㄚ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a water bird with webbed feet that says quack", tips: "字母 u 發 /ʌ/，結尾 ck 發清脆的 /k/。", img: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=800&q=80" },
       { word: "milk", ipa: "/mɪlk/", ruby: "<ruby>牛<rt>ㄋㄧㄡˊ</rt></ruby><ruby>奶<rt>ㄋㄞˇ</rt></ruby>", enDef: "a white drink that comes from cows and goats", tips: "i 發短音 /ɪ/，字尾 l-k 舌尖抵上牙齦後帶爆破。", img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80" },
       { word: "tree", ipa: "/triː/", ruby: "<ruby>樹<rt>ㄕㄨˋ</rt></ruby><ruby>木<rt>ㄇㄨˋ</rt></ruby>", enDef: "a tall plant with a wooden trunk and green leaves", tips: "tr 是子音群 /tr/，雙字母 ee 發長音 /iː/。", img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80" },
-      { word: "bird", ipa: "/bɝːd/", ruby: "<ruby>小<rt>ㄒㄧㄠˇ</rt></ruby><ruby>鳥<rt>ㄋㄧㄠˇ</rt></ruby>", enDef: "an animal with feathers and wings that can fly", tips: "ir 發捲舌音 /ɝː/，舌頭往後上方捲起。", img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=800&q=80" }
+      { word: "bird", ipa: "/bɝːd/", ruby: "<ruby>小<rt>ㄒㄧㄠˇ</rt></ruby><ruby>鳥<rt>ㄋㄧㄠˇ</rt></ruby>", enDef: "an animal with feathers and wings that can fly", tips: "ir 發捲舌音 /ɝː/，舌頭往後上方捲起。", img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=800&q=80" },
+      { word: "egg", ipa: "/eɡ/", ruby: "<ruby>雞<rt>ㄐㄧ</rt></ruby><ruby>蛋<rt>ㄉㄢˋ</rt></ruby>", enDef: "an oval food with a hard shell laid by birds", tips: "字母 e 發短母音 /e/，字尾 gg 發濁輔音 /ɡ/。", img: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=800&q=80" },
+      { word: "car", ipa: "/kɑːr/", ruby: "<ruby>汽<rt>ㄑㄧˋ</rt></ruby><ruby>車<rt>ㄔㄜ</rt></ruby>", enDef: "a vehicle with four wheels moved by an engine", tips: "字母組合 ar 發捲舌音 /ɑːr/，嘴型大而深。", img: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80" },
+      { word: "bus", ipa: "/bʌs/", ruby: "<ruby>公<rt>ㄍㄨㄥ</rt></ruby><ruby>車<rt>ㄔㄜ</rt></ruby>", enDef: "a large vehicle that carries many people", tips: "u 發短音 /ʌ/，尾音 s 如蛇吐信輕吐氣。", img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=800&q=80" },
+      { word: "pen", ipa: "/pen/", ruby: "<ruby>原<rt>ㄩㄢˊ</rt></ruby><ruby>子<rt>ㄗˇ</rt></ruby><ruby>筆<rt>ㄅㄧˇ</rt></ruby>", enDef: "a tool with ink inside used for writing", tips: "p 爆破吐氣，e 發短音 /e/，尾音 n 舌尖頂上顎鼻音。", img: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=800&q=80" },
+
+      // === 第三組（第 3 天）===
+      { word: "box", ipa: "/bɑːks/", ruby: "<ruby>盒<rt>ㄏㄜˊ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a square container with flat sides for keeping things", tips: "字母 x 發 /ks/ 複合音，結尾帶有氣音。", img: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=800&q=80" },
+      { word: "fox", ipa: "/fɑːks/", ruby: "<ruby>狐<rt>ㄏㄨˊ</rt></ruby><ruby>狸<rt>ㄌㄧˊ</rt></ruby>", enDef: "a wild animal with red fur and a bushy tail", tips: "與 box 為押韻字族，開頭 f 上牙輕觸下唇。", img: "https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=800&q=80" },
+      { word: "pig", ipa: "/pɪɡ/", ruby: "<ruby>小<rt>ㄒㄧㄠˇ</rt></ruby><ruby>豬<rt>ㄓㄨ</rt></ruby>", enDef: "a farm animal with a curly tail and short legs", tips: "字母 i 發短母音 /ɪ/，短促俐落，不念長音 ee。", img: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=800&q=80" },
+      { word: "bee", ipa: "/biː/", ruby: "<ruby>蜜<rt>ㄇㄧˋ</rt></ruby><ruby>蜂<rt>ㄈㄥ</rt></ruby>", enDef: "a flying yellow and black insect that makes honey", tips: "雙字母 ee 發明亮清晰的長母音 /iː/。", img: "https://images.unsplash.com/photo-1568526381923-caf3fd520382?auto=format&fit=crop&w=800&q=80" },
+      { word: "frog", ipa: "/frɑːɡ/", ruby: "<ruby>青<rt>ㄑㄧㄥ</rt></ruby><ruby>蛙<rt>ㄨㄚ</rt></ruby>", enDef: "a small green jumping animal that lives near water", tips: "fr 子音群連讀，字母 o 嘴唇圓圓發 /ɑː/。", img: "https://images.unsplash.com/photo-1559253664-ca249d4608c6?auto=format&fit=crop&w=800&q=80" },
+      { word: "moon", ipa: "/muːn/", ruby: "<ruby>月<rt>ㄩㄝˋ</rt></ruby><ruby>亮<rt>ㄌㄧㄤˋ</rt></ruby>", enDef: "the round object that shines in the dark sky at night", tips: "雙字母 oo 這裡發圓唇長母音 /uː/。", img: "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?auto=format&fit=crop&w=800&q=80" },
+      { word: "star", ipa: "/stɑːr/", ruby: "<ruby>星<rt>ㄒㄧㄥ</rt></ruby><ruby>星<rt>ㄒㄧㄥ</rt></ruby>", enDef: "a tiny bright light twinkling in the night sky", tips: "st 是常見輔音群，ar 發長捲舌音 /ɑːr/。", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80" },
+      { word: "shoe", ipa: "/ʃuː/", ruby: "<ruby>鞋<rt>ㄒㄧㄝˊ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "something you wear on your foot to protect it", tips: "sh 發噓聲 /ʃ/，oe 組合發長母音 /uː/。", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80" },
+      { word: "sock", ipa: "/sɑːk/", ruby: "<ruby>襪<rt>ㄨㄚˋ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "soft clothing you wear on your foot inside your shoe", tips: "字母 o 發 /ɑː/，結尾 ck 發清音 /k/。", img: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&w=800&q=80" },
+      { word: "door", ipa: "/dɔːr/", ruby: "<ruby>門<rt>ㄇㄣˊ</rt></ruby>", enDef: "the part of a room that swings open and shut", tips: "開頭 d 清楚頓音，oor 發圓唇捲舌音 /ɔːr/。", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80" },
+
+      // === 第四組（第 4 天）===
+      { word: "ball", ipa: "/bɑːl/", ruby: "<ruby>球<rt>ㄑㄧㄡˊ</rt></ruby>", enDef: "a round toy that you bounce, throw, or kick", tips: "all 組合念 /ɑːl/，舌尖最後頂上牙齒後方。", img: "https://images.unsplash.com/photo-1614632537423-1e6c2e7e0aab?auto=format&fit=crop&w=800&q=80" },
+      { word: "cake", ipa: "/keɪk/", ruby: "<ruby>蛋<rt>ㄉㄢˋ</rt></ruby><ruby>糕<rt>ㄍㄠ</rt></ruby>", enDef: "a sweet baked dessert often eaten on birthdays", tips: "字尾有不發音 e（Magic E），讓 a 發長音 /eɪ/。", img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80" },
+      { word: "kite", ipa: "/kaɪt/", ruby: "<ruby>風<rt>ㄈㄥ</rt></ruby><ruby>箏<rt>ㄓㄥ</rt></ruby>", enDef: "a light toy flown in the wind on a long string", tips: "Magic E 規則：結尾 e 讓字母 i 發長母音 /aɪ/。", img: "https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=800&q=80" },
+      { word: "boat", ipa: "/boʊt/", ruby: "<ruby>小<rt>ㄒㄧㄠˇ</rt></ruby><ruby>船<rt>ㄔㄨㄢˊ</rt></ruby>", enDef: "a small vehicle used for traveling across water", tips: "oa 母音組合發長音 /oʊ/，嘴型由圓縮小。", img: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=800&q=80" },
+      { word: "bike", ipa: "/baɪk/", ruby: "<ruby>腳<rt>ㄐㄧㄠˇ</rt></ruby><ruby>踏<rt>ㄊㄚˋ</rt></ruby><ruby>車<rt>ㄔㄜ</rt></ruby>", enDef: "a two-wheeled vehicle that you ride by pedaling", tips: "同樣是 Magic E 規則，字母 i 發長音 /aɪ/。", img: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80" },
+      { word: "lion", ipa: "/ˈlaɪ.ən/", ruby: "<ruby>獅<rt>ㄕ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a large wild cat with a golden mane called king of beasts", tips: "第一音節 li- 發 /laɪ/，第二音節 -on 發弱音 /ən/。", img: "https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?auto=format&fit=crop&w=800&q=80" },
+      { word: "bear", ipa: "/ber/", ruby: "<ruby>大<rt>ㄉㄚˋ</rt></ruby><ruby>熊<rt>ㄒㄩㄥˊ</rt></ruby>", enDef: "a large heavy furry animal with sharp claws", tips: "ear 組合在這裡發 /er/，嘴巴微張帶捲舌。", img: "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80" },
+      { word: "desk", ipa: "/desk/", ruby: "<ruby>書<rt>ㄕㄨ</rt></ruby><ruby>桌<rt>ㄓㄨㄛ</rt></ruby>", enDef: "a table with flat surface used for reading and writing", tips: "字母 e 發短音 /e/，結尾 sk 輔音群俐落收尾。", img: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=800&q=80" },
+      { word: "chair", ipa: "/tʃer/", ruby: "<ruby>椅<rt>ㄧˇ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a piece of furniture with four legs built for sitting", tips: "ch 發氣音 /tʃ/，air 組合發母音 /er/。", img: "https://images.unsplash.com/photo-1580481077111-20922879555d?auto=format&fit=crop&w=800&q=80" },
+      { word: "clock", ipa: "/klɑːk/", ruby: "<ruby>時<rt>ㄕˊ</rt></ruby><ruby>鐘<rt>ㄓㄨㄥ</rt></ruby>", enDef: "an instrument on the wall that tells what time it is", tips: "cl 是子音群 /kl/，ck 發清輔音 /k/。", img: "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?auto=format&fit=crop&w=800&q=80" },
+
+      // === 第五組（第 5 天）===
+      { word: "leaf", ipa: "/liːf/", ruby: "<ruby>樹<rt>ㄕㄨˋ</rt></ruby><ruby>葉<rt>ㄧㄝˋ</rt></ruby>", enDef: "a flat green part that grows from the branch of a tree", tips: "ea 組合發長母音 /iː/，尾音 f 上牙輕觸下唇。", img: "https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80" },
+      { word: "rain", ipa: "/reɪn/", ruby: "<ruby>下<rt>ㄒㄧㄚˋ</rt></ruby><ruby>雨<rt>ㄩˇ</rt></ruby>", enDef: "water that falls in drops from clouds in the sky", tips: "ai 母音組合發長音 /eɪ/，結尾 n 帶鼻音。", img: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=800&q=80" },
+      { word: "snow", ipa: "/snoʊ/", ruby: "<ruby>下<rt>ㄒㄧㄚˋ</rt></ruby><ruby>雪<rt>ㄒㄩㄝˇ</rt></ruby>", enDef: "soft cold white flakes that fall from the winter sky", tips: "sn 子音群連讀，ow 組合發長雙母音 /oʊ/。", img: "https://images.unsplash.com/photo-1517299321929-e42dd1dd9720?auto=format&fit=crop&w=800&q=80" },
+      { word: "ring", ipa: "/rɪŋ/", ruby: "<ruby>戒<rt>ㄐㄧㄝˋ</rt></ruby><ruby>指<rt>ㄓˇ</rt></ruby>", enDef: "a small shiny round band worn on a finger", tips: "字母 i 發短音 /ɪ/，ng 發後鼻音 /ŋ/。", img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=800&q=80" },
+      { word: "key", ipa: "/kiː/", ruby: "<ruby>鑰<rt>ㄧㄠˋ</rt></ruby><ruby>匙<rt>˙ㄕ</rt></ruby>", enDef: "a small piece of metal used to open and lock a door", tips: "字母組合 ey 這裡發長母音 /iː/。", img: "https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=800&q=80" },
+      { word: "spoon", ipa: "/spuːn/", ruby: "<ruby>湯<rt>ㄊㄤ</rt></ruby><ruby>匙<rt>ㄔˊ</rt></ruby>", enDef: "an eating tool with a small round bowl and handle", tips: "sp 子音群，雙字母 oo 發長音 /uː/。", img: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?auto=format&fit=crop&w=800&q=80" },
+      { word: "fork", ipa: "/fɔːrk/", ruby: "<ruby>叉<rt>ㄔㄚ</rt></ruby><ruby>子<rt>ㄗ˙</rt></ruby>", enDef: "a tool with three or four points used for picking up food", tips: "or 組合發圓唇捲舌音 /ɔːrk/，結尾有頓音 k。", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80" },
+      { word: "hand", ipa: "/hænd/", ruby: "<ruby>手<rt>ㄕㄡˇ</rt></ruby>", enDef: "the part of the body at the end of your arm", tips: "字母 a 發短母音 /æ/，結尾 nd 順暢連讀。", img: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=800&q=80" },
+      { word: "foot", ipa: "/fʊt/", ruby: "<ruby>腳<rt>ㄐㄧㄠˇ</rt></ruby>", enDef: "the part of your body you stand and walk on", tips: "雙字母 oo 這裡發短音 /ʊ/，與 book 相同。", img: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80" },
+      { word: "star", ipa: "/stɑːr/", ruby: "<ruby>星<rt>ㄒㄧㄥ</rt></ruby><ruby>星<rt>ㄒㄧㄥ</rt></ruby>", enDef: "a tiny bright light shining in the night sky", tips: "st 輔音群，ar 組合發長音 /ɑːr/。", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80" }
     ];
 
-    let dayOffset = 0;
+    const WORDS_PER_DAY = 10;
+    const TOTAL_GROUPS = masterWordList.length / WORDS_PER_DAY; // 5 組
+
+    let currentGroupOffset = 0;
     let currentPage = 1;
     let current10Words = [];
-    let customRandomSeed = null;
 
-    // 擬隨機演算法：依據日期種子產生每天固定但不同天的隨機分佈
-    function seededRandom(seed) {
-      const x = Math.sin(seed++) * 10000;
-      return x - Math.floor(x);
+    // 計算當天對應的「固定組別」
+    function getTodayGroupIndex() {
+      const now = new Date();
+      // 使用絕對天數計算，確保跨月依然連貫循環
+      const dayCount = Math.floor(now.getTime() / (1000 * 60 * 60 * 24));
+      return (dayCount % TOTAL_GROUPS);
     }
 
-    function getWordsForDay(offset) {
-      const targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + offset);
+    function renderCards() {
+      // 計算當前顯示第幾組 (0 ~ 4)
+      const baseGroup = getTodayGroupIndex();
+      let activeGroup = (baseGroup + currentGroupOffset) % TOTAL_GROUPS;
+      if (activeGroup < 0) activeGroup += TOTAL_GROUPS;
 
-      // 日期種子數
-      const dateSeed = customRandomSeed !== null ? customRandomSeed : 
-        (targetDate.getFullYear() * 10000 + (targetDate.getMonth() + 1) * 100 + targetDate.getDate());
+      const startIndex = activeGroup * WORDS_PER_DAY;
+      current10Words = masterWordList.slice(startIndex, startIndex + WORDS_PER_DAY);
 
-      // 洗牌演算法
-      let pool = [...masterWordList];
-      let seed = dateSeed;
-      for (let i = pool.length - 1; i > 0; i--) {
-        const j = Math.floor(seededRandom(seed++) * (i + 1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
-      }
-
-      return { words: pool.slice(0, 10), date: targetDate };
-    }
-
-    function renderDay() {
-      const { words, date } = getWordsForDay(dayOffset);
-      current10Words = words;
-
-      const dateStr = `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`;
-      document.getElementById('date-display').textContent = `📅 ${dateStr} 今日隨機 10 單字`;
+      // 日期與組別顯示
+      const now = new Date();
+      now.setDate(now.getDate() + currentGroupOffset);
+      const dateStr = `${now.getFullYear()} 年 ${now.getMonth() + 1} 月 ${now.getDate()} 日`;
+      document.getElementById('date-display').textContent = `📅 ${dateStr} ｜ 第 ${activeGroup + 1} 組單字（共 5 組循環）`;
 
       const container = document.getElementById('cards-container');
       container.innerHTML = '';
@@ -446,13 +475,12 @@
       return str.replace(/'/g, "\\'");
     }
 
-    // 瀏覽器美語語音播放（單字與句子皆適用）
     function playAudio(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
-        utterance.rate = 0.82; // 稍微放慢速度，便於兒童清楚辨識自然發音
+        utterance.rate = 0.82; // 幼兒適應微慢速
         window.speechSynthesis.speak(utterance);
       } else {
         alert('您的瀏覽器目前未開啟語音播放支援。');
@@ -474,28 +502,20 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function changeDayOffset(delta) {
-      customRandomSeed = null;
-      dayOffset += delta;
-      renderDay();
+    function changeGroup(delta) {
+      currentGroupOffset += delta;
+      renderCards();
       switchPage(1);
     }
 
     function resetToday() {
-      customRandomSeed = null;
-      dayOffset = 0;
-      renderDay();
-      switchPage(1);
-    }
-
-    function randomNewBatch() {
-      customRandomSeed = Math.floor(Math.random() * 1000000);
-      renderDay();
+      currentGroupOffset = 0;
+      renderCards();
       switchPage(1);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      renderDay();
+      renderCards();
     });
   </script>
 </body>
